@@ -1,8 +1,49 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import BootScreen from "@/components/BootScreen";
 import SystemBackground from "@/components/SystemBackground";
+
+const projects = [
+  {
+    id: "inkcheck",
+    title: "InkCheck",
+    url: "https://inkcheck.io",
+    desc: "AI-assisted writing editor",
+  },
+  {
+    id: "applywell",
+    title: "ApplyWell",
+    url: "https://applywell.io",
+    desc: "Resume & application builder",
+  },
+  {
+    id: "offerintegrity",
+    title: "OfferIntegrity",
+    url: "https://offerintegrity.io",
+    desc: "High-ticket offer validator",
+  },
+  {
+    id: "bettercalculators",
+    title: "BetterCalculators",
+    url: "https://bettercalculators.net",
+    desc: "170+ free calculators",
+  },
+  {
+    id: "toolsdock",
+    title: "ToolsDock",
+    url: "https://toolsdock.io",
+    desc: "Developer utilities & tools",
+  },
+];
+
+const statusLines = [
+  { key: "inkcheck",       dots: "........" },
+  { key: "applywell",      dots: "......." },
+  { key: "offerintegrity", dots: ".." },
+  { key: "calculators",    dots: "....." },
+  { key: "toolsdock",      dots: "......." },
+];
 
 export default function Page() {
   const [booted, setBooted] = useState(false);
@@ -35,75 +76,125 @@ export default function Page() {
   );
 }
 
-function Dashboard({ restartBoot }: any) {
+function Dashboard({ restartBoot }: { restartBoot: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "r") restartBoot();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [restartBoot]);
+
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
-
       <SystemBackground />
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
+      {/* Retro reboot key — fixed top-left */}
+      <button onClick={restartBoot} className="reboot-key" title="Reboot System">
+        REBOOT
+      </button>
 
-        <h1 className="text-5xl md:text-6xl font-bold mb-4 text-green-400 tracking-wider">
-          gambino.labs
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 py-24">
+
+        {/* Main heading with blinking cursor */}
+        <h1 className="neon-heading text-5xl md:text-7xl font-bold">
+          gambino.labs<span className="blink-cursor">_</span>
         </h1>
 
-        <p className="text-green-300 mb-6 opacity-70 text-center">
-          experimental software • tools • creative systems
+        {/* Subheading */}
+        <p className="subheading mt-4 mb-8 text-center">
+          experimental software · tools · creative systems
         </p>
 
-        <button
-          onClick={restartBoot}
-          className="mb-12 border border-green-500 px-4 py-2 text-sm text-green-400 hover:bg-green-500 hover:text-black transition"
-        >
-          replay boot sequence
-        </button>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full">
-
-          <Card
-            title="INKCHECK"
-            desc="AI-assisted writing editor"
-            link="https://inkcheck.io"
-          />
-
-          <Card
-            title="BETTER CALCULATORS"
-            desc="170+ free calculators"
-            link="https://bettercalculators.net"
-          />
-
-          <Card
-            title="OFFER INTEGRITY"
-            desc="high-ticket offer validator"
-            link="https://offerintegrity.com"
-          />
-
-  
-
+        {/* Terminal status block */}
+        <div className="terminal-status mb-12">
+          <div className="terminal-header">// system status</div>
+          {statusLines.map((line) => (
+            <div key={line.key} className="terminal-line">
+              <span className="terminal-label">{line.key}</span>
+              <span className="terminal-dots">{line.dots}</span>
+              <span className="terminal-online">online</span>
+            </div>
+          ))}
         </div>
+
+        {/* Module cards grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl w-full">
+          {projects.map((project, i) => (
+            <ModuleCard key={project.id} project={project} index={i} />
+          ))}
+        </div>
+
+        {/* Terminal hint */}
+        <p className="sys-hint mt-14">
+          press <kbd className="sys-kbd">R</kbd> to reboot system
+        </p>
+
+        {/* Footer */}
+        <footer className="sys-footer mt-4">
+          <div className="sys-footer-title">gambino.labs</div>
+          <div className="sys-footer-sub">experimental software · tools · creative systems</div>
+          <div className="sys-footer-copy">© 2026 Gambino Labs</div>
+        </footer>
 
       </div>
     </main>
   );
 }
 
-function Card({ title, desc, link }: any) {
+function ModuleCard({
+  project,
+  index,
+}: {
+  project: (typeof projects)[0];
+  index: number;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <a
-      href={link}
+      ref={ref}
+      href={project.url}
       target="_blank"
-      className="group border border-green-500/30 rounded-xl p-6 hover:border-green-400 transition duration-300 backdrop-blur-sm bg-black/40 hover:bg-black/60"
+      rel="noopener noreferrer"
+      className={`module-card${visible ? " module-card--visible" : ""}`}
+      style={{ transitionDelay: `${index * 80}ms` }}
     >
-      <h2 className="text-xl font-semibold text-green-400 mb-2">
-        {title}
-      </h2>
+      {/* Sweep-on-hover overlay */}
+      <div className="card-sweep-overlay" aria-hidden="true" />
 
-      <p className="text-green-200 text-sm opacity-70">
-        {desc}
-      </p>
+      <div className="card-inner">
+        <div className="card-meta">
+          <span className="module-index">
+            module_{String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="status-dot" />
+        </div>
 
-      <div className="mt-4 text-green-500 text-xs opacity-60 group-hover:opacity-100">
-        open module →
+        <h2 className="module-title">{project.title}</h2>
+        <p className="module-desc">{project.desc}</p>
+
+        <div className="module-link">
+          <span>open module</span>
+          <span className="link-arrow">→</span>
+        </div>
       </div>
     </a>
   );
