@@ -14,7 +14,6 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Gambino Labs",
-  template: "%s | Gambino Labs",
   description: "Experimental software • tools • creative systems",
 };
 
