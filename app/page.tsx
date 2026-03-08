@@ -14,17 +14,28 @@ export default function Page() {
 
   return (
     <>
-      {!booted && <BootScreen onComplete={() => {
-        localStorage.setItem("bootSeen","true");
-        setBooted(true);
-      }} />}
+      {!booted && (
+        <BootScreen
+          onComplete={() => {
+            localStorage.setItem("bootSeen", "true");
+            setBooted(true);
+          }}
+        />
+      )}
 
-      {booted && <Dashboard />}
+      {booted && (
+        <Dashboard
+          restartBoot={() => {
+            localStorage.removeItem("bootSeen");
+            setBooted(false);
+          }}
+        />
+      )}
     </>
   );
 }
 
-function Dashboard() {
+function Dashboard({ restartBoot }: any) {
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
 
@@ -33,24 +44,45 @@ function Dashboard() {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
 
         <h1 className="text-5xl md:text-6xl font-bold mb-4 text-green-400 tracking-wider">
-          gambinos.system
+          gambino.labs
         </h1>
 
-        <p className="text-green-300 mb-12 opacity-70">
-          creative engine online
+        <p className="text-green-300 mb-6 opacity-70 text-center">
+          experimental software • tools • creative systems
         </p>
+
+        <button
+          onClick={restartBoot}
+          className="mb-12 border border-green-500 px-4 py-2 text-sm text-green-400 hover:bg-green-500 hover:text-black transition"
+        >
+          replay boot sequence
+        </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full">
 
-          <Card title="TOOLS" desc="calculators & utilities" link="#" />
-          <Card title="PROJECTS" desc="software builds" link="#" />
-          <Card title="EXPERIMENTS" desc="ai & strange ideas" link="#" />
-          <Card title="WRITING" desc="stories & worlds" link="#" />
+          <Card
+            title="INKCHECK"
+            desc="AI-assisted writing editor"
+            link="https://inkcheck.io"
+          />
+
+          <Card
+            title="BETTER CALCULATORS"
+            desc="170+ free calculators"
+            link="https://bettercalculators.net"
+          />
+
+          <Card
+            title="OFFER INTEGRITY"
+            desc="high-ticket offer validator"
+            link="https://offerintegrity.com"
+          />
+
+  
 
         </div>
 
       </div>
-
     </main>
   );
 }
@@ -59,6 +91,7 @@ function Card({ title, desc, link }: any) {
   return (
     <a
       href={link}
+      target="_blank"
       className="group border border-green-500/30 rounded-xl p-6 hover:border-green-400 transition duration-300 backdrop-blur-sm bg-black/40 hover:bg-black/60"
     >
       <h2 className="text-xl font-semibold text-green-400 mb-2">
