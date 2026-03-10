@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 
 export default function SystemBackground() {
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    // BUG FIX: Added -z-20 (was no z-index set).
+    // Stack: SystemBackground (-z-20) → NetworkBackground (-z-10) → content (z-10)
+    <div className="absolute inset-0 overflow-hidden -z-20">
 
       {/* animated grid */}
       <motion.div
