@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import BootScreen from "@/components/BootScreen";
 
 const projects = [
   { id: "inkcheck", title: "InkCheck", url: "https://inkcheck.io", desc: "AI-assisted writing editor" },
@@ -415,15 +416,30 @@ export default function Page() {
     if (seen) setBooted(true);
   }, []);
 
-  // Skip boot for demo — remove this and restore BootScreen as needed
-  useEffect(() => { setBooted(true); }, []);
-
   const restartBoot = useCallback(() => {
     localStorage.removeItem("bootSeen");
     setBooted(false);
   }, []);
 
-  if (!booted) return null;
+  // R key to reboot
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "r") restartBoot();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [restartBoot]);
+
+  if (!booted) {
+    return (
+      <BootScreen
+        onComplete={() => {
+          localStorage.setItem("bootSeen", "true");
+          setBooted(true);
+        }}
+      />
+    );
+  }
 
   return (
     <main className="cyb-root">
