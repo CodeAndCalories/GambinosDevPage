@@ -397,6 +397,147 @@ function HoloCard({ project, index }: { project: typeof projects[0]; index: numb
   );
 }
 
+// ─── Typewriter subheading ────────────────────────────────────────────────
+function Typewriter({ text, delay = 0 }: { text: string; delay?: number }) {
+  const [displayed, setDisplayed] = useState("");
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (displayed.length >= text.length) return;
+    const t = setTimeout(() => {
+      setDisplayed(text.slice(0, displayed.length + 1));
+    }, 45 + Math.random() * 35);
+    return () => clearTimeout(t);
+  }, [started, displayed, text]);
+
+  return (
+    <p className="subheading mt-4 mb-10 text-center">
+      {displayed}
+      {displayed.length < text.length && (
+        <span className="blink-cursor" style={{ fontSize: "10px" }}>▋</span>
+      )}
+    </p>
+  );
+}
+
+// ─── Uptime counter ───────────────────────────────────────────────────────
+function UptimeCounter() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const start = Date.now();
+    const iv = setInterval(() => {
+      setSeconds(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+  const s = String(seconds % 60).padStart(2, "0");
+
+  return (
+    <div className="terminal-line" style={{ marginTop: "6px", borderTop: "1px solid rgba(0,255,156,0.07)", paddingTop: "6px" }}>
+      <span className="terminal-label" style={{ color: "rgba(0,255,156,0.4)" }}>sys_uptime</span>
+      <span className="terminal-dots">...</span>
+      <span className="terminal-online" style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "0.08em" }}>
+        {h}:{m}:{s}
+      </span>
+    </div>
+  );
+}
+
+// ─── System alert toasts ──────────────────────────────────────────────────
+const ALERT_MESSAGES = [
+  "[SYS] > anomaly detected in sector 7",
+  "[NET] > new connection established",
+  "[SEC] > firewall rules updated",
+  "[MEM] > cache purge complete",
+  "[SYS] > background processes nominal",
+  "[NET] > packet loss < 0.01% — optimal",
+  "[SEC] > intrusion attempt blocked",
+  "[SYS] > entropy pool refreshed",
+  "[NET] > routing table synchronized",
+  "[MEM] > heap compaction finished",
+  "[SEC] > certificates rotated",
+  "[SYS] > watchdog timer reset",
+];
+
+function SystemAlerts() {
+  const [toasts, setToasts] = useState<{ id: number; msg: string }[]>([]);
+  const counter = useRef(0);
+
+  useEffect(() => {
+    const scheduleNext = () => {
+      const delay = 12000 + Math.random() * 20000; // 12–32s
+      return setTimeout(() => {
+        const msg = ALERT_MESSAGES[Math.floor(Math.random() * ALERT_MESSAGES.length)];
+        const id = ++counter.current;
+        setToasts((prev) => [...prev.slice(-3), { id, msg }]);
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, 4500);
+        scheduleNext();
+      }, delay);
+    };
+    const t = scheduleNext();
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div style={{
+      position: "fixed", bottom: "24px", right: "24px",
+      zIndex: 8000, display: "flex", flexDirection: "column", gap: "8px",
+      alignItems: "flex-end", pointerEvents: "none",
+    }}>
+      {toasts.map((toast) => (
+        <div key={toast.id} className="sys-toast">
+          {toast.msg}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Easter egg — ↑↑↓↓ triggers glitch explosion ─────────────────────────
+const CHEAT_CODE = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown"];
+
+function EasterEgg() {
+  const [active, setActive] = useState(false);
+  const seq = useRef<string[]>([]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      seq.current = [...seq.current, e.key].slice(-CHEAT_CODE.length);
+      if (seq.current.join(",") === CHEAT_CODE.join(",")) {
+        setActive(true);
+        setTimeout(() => setActive(false), 3200);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  if (!active) return null;
+
+  return (
+    <div className="easter-overlay">
+      <div className="easter-box">
+        <div className="easter-skull">☠</div>
+        <div className="easter-title">ACCESS GRANTED</div>
+        <div className="easter-sub">welcome to the mainframe, operator</div>
+        <div className="easter-code">CLEARANCE LEVEL: OMEGA</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Glitch text ──────────────────────────────────────────────────────────
 function GlitchTitle() {
   const text = "gambino.labs";
@@ -452,6 +593,12 @@ export default function Page() {
       {/* Layer 9999: cursor trail */}
       <CursorTrail />
 
+      {/* System alert toasts */}
+      <SystemAlerts />
+
+      {/* Easter egg overlay */}
+      <EasterEgg />
+
       {/* REBOOT button — preserved exactly */}
       <button onClick={restartBoot} className="reboot-key" title="Reboot System">
         REBOOT
@@ -462,9 +609,7 @@ export default function Page() {
 
         <GlitchTitle />
 
-        <p className="subheading mt-4 mb-10 text-center">
-          experimental software · tools · creative systems
-        </p>
+        <Typewriter text="experimental software · tools · creative systems" delay={400} />
 
         {/* System status */}
         <div className="terminal-status mb-12">
@@ -476,6 +621,7 @@ export default function Page() {
               <span className="terminal-online">online</span>
             </div>
           ))}
+          <UptimeCounter />
         </div>
 
         {/* Cards */}
@@ -743,6 +889,118 @@ export default function Page() {
         /* ── sys-hint / kbd ── */
         .sys-hint { font-family: inherit; font-size: 11px; letter-spacing: 0.12em; color: rgba(0,255,156,0.55); text-align: center; }
         .sys-kbd { display: inline-block; font-family: inherit; font-size: 10px; color: #00ff9c; border: 1px solid rgba(0,255,156,0.45); border-bottom-width: 2px; border-radius: 3px; padding: 1px 5px; background: rgba(0,255,156,0.05); }
+
+        /* ── System alert toasts ── */
+        @keyframes toast-in {
+          from { opacity: 0; transform: translateX(32px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toast-out {
+          from { opacity: 1; }
+          to   { opacity: 0; }
+        }
+
+        .sys-toast {
+          font-family: 'JetBrains Mono','Fira Code','Courier New',monospace;
+          font-size: 10px;
+          letter-spacing: 0.08em;
+          color: #00ff9c;
+          background: rgba(0,0,0,0.88);
+          border: 1px solid rgba(0,255,156,0.3);
+          border-left: 3px solid #00ff9c;
+          border-radius: 4px;
+          padding: 8px 14px;
+          box-shadow: 0 0 18px rgba(0,255,156,0.15), 0 4px 24px rgba(0,0,0,0.6);
+          animation: toast-in 0.35s cubic-bezier(0.22,1,0.36,1) forwards;
+          max-width: 320px;
+          white-space: nowrap;
+        }
+
+        /* ── Easter egg ── */
+        @keyframes ee-flicker {
+          0%,100% { opacity: 1; }
+          8%  { opacity: 0.1; }
+          10% { opacity: 1; }
+          42% { opacity: 0.8; }
+          43% { opacity: 0.1; }
+          45% { opacity: 1; }
+          76% { opacity: 0.9; }
+          77% { opacity: 0.05; }
+          79% { opacity: 1; }
+        }
+
+        @keyframes ee-scan {
+          from { top: -100%; }
+          to   { top: 200%; }
+        }
+
+        @keyframes ee-in {
+          from { opacity: 0; transform: scale(0.85); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes ee-chromatic {
+          0%,100% { text-shadow: -2px 0 #ff0055, 2px 0 #00ffd5; }
+          33% { text-shadow: 2px 0 #ff0055, -2px 0 #00ffd5; }
+          66% { text-shadow: 0 0 #ff0055, 0 0 #00ffd5; }
+        }
+
+        .easter-overlay {
+          position: fixed; inset: 0; z-index: 99999;
+          background: rgba(0,0,0,0.92);
+          display: flex; align-items: center; justify-content: center;
+          animation: ee-flicker 0.5s ease forwards;
+          overflow: hidden;
+        }
+
+        .easter-overlay::before {
+          content: '';
+          position: absolute;
+          left: 0; width: 100%; height: 40%;
+          background: linear-gradient(transparent, rgba(0,255,156,0.06), transparent);
+          animation: ee-scan 1.2s linear infinite;
+        }
+
+        .easter-box {
+          text-align: center;
+          animation: ee-in 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+          font-family: 'JetBrains Mono','Fira Code','Courier New',monospace;
+        }
+
+        .easter-skull {
+          font-size: 72px;
+          line-height: 1;
+          margin-bottom: 24px;
+          filter: drop-shadow(0 0 24px #00ff9c);
+          animation: ee-chromatic 0.3s infinite;
+        }
+
+        .easter-title {
+          font-size: clamp(2rem, 6vw, 3.5rem);
+          font-weight: 700;
+          color: #00ff9c;
+          letter-spacing: 0.2em;
+          text-shadow: 0 0 30px rgba(0,255,156,0.8), 0 0 60px rgba(0,255,156,0.4);
+          animation: ee-chromatic 0.25s infinite;
+          margin-bottom: 16px;
+        }
+
+        .easter-sub {
+          font-size: 13px;
+          color: rgba(0,255,156,0.7);
+          letter-spacing: 0.12em;
+          margin-bottom: 12px;
+        }
+
+        .easter-code {
+          font-size: 11px;
+          color: rgba(0,255,156,0.4);
+          letter-spacing: 0.16em;
+          border: 1px solid rgba(0,255,156,0.2);
+          display: inline-block;
+          padding: 4px 16px;
+          border-radius: 3px;
+        }
 
         /* ── Footer ── */
         .sys-footer { font-family: inherit; text-align: center; border-top: 1px solid rgba(0,255,156,0.08); padding-top: 16px; width: 100%; }
