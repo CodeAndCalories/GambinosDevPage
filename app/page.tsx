@@ -620,30 +620,20 @@ export default function Page() {
         {/* System status */}
         <div className="terminal-status mb-12">
           <div className="terminal-header">// system status</div>
-          {(() => {
-            const chunked: typeof statusLines[] = [];
-            for (let i = 0; i < statusLines.length; i += 2) {
-              chunked.push(statusLines.slice(i, i + 2));
-            }
-            return chunked.map((pair, rowIndex) => (
-              <div key={rowIndex} className="flex justify-between gap-6">
-                {pair.map((line) => (
-                  <div key={line.key} className="w-1/2">
-                    <div className="terminal-line">
-                      <span className="terminal-label">{line.key}</span>
-                      <span className="terminal-dots">{line.dots}</span>
-                      <span className="terminal-online">online</span>
-                    </div>
-                  </div>
-                ))}
+          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+            {statusLines.map((line, i) => (
+              <div key={i} className="terminal-line">
+                <span className="terminal-label">{line.key}</span>
+                <span className="terminal-dots">{line.dots}</span>
+                <span className="terminal-online">online</span>
               </div>
-            ));
-          })()}
+            ))}
+          </div>
           <UptimeCounter />
         </div>
 
         {/* Cards */}
-        <div className="group/system relative scanline-container">
+        <div className="group/system relative scanline-container mt-8 md:mt-10">
           <div className="cyb-grid">
             {projects.map((project, i) => (
               <HoloCard key={project.id} project={project} index={i} />
