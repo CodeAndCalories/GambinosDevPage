@@ -386,7 +386,14 @@ body {
     transparent 100%
   );
   opacity: 0.4;
-  animation: scanline-move 6s linear infinite;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  animation: scanline-move 8s ease-in-out infinite;
   pointer-events: none;
 }
 
