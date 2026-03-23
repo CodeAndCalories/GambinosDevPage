@@ -620,11 +620,10 @@ export default function Page() {
         {/* System status */}
         <div className="terminal-status mb-12">
           <div className="terminal-header">// system status</div>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem 2rem' }}>
             {statusLines.map((line, i) => (
-              <div key={i} className="terminal-line">
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem', alignItems: 'center' }}>
                 <span className="terminal-label">{line.key}</span>
-                <span className="terminal-dots">{line.dots}</span>
                 <span className="terminal-online">online</span>
               </div>
             ))}
@@ -633,7 +632,7 @@ export default function Page() {
         </div>
 
         {/* Cards */}
-        <div className="group/system relative scanline-container mt-8 md:mt-10">
+        <div className="group/system relative scanline-container mt-8 md:mt-10 mb-16">
           <div className="cyb-grid">
             {projects.map((project, i) => (
               <HoloCard key={project.id} project={project} index={i} />
@@ -787,7 +786,7 @@ export default function Page() {
           border: 1px solid rgba(0,255,156,0.1);
           border-radius: 8px;
           padding: 14px 22px;
-          width: 100%; max-width: 310px;
+          width: 100%; max-width: 640px;
           line-height: 2;
           font-family: inherit;
         }
