@@ -371,9 +371,14 @@ body {
 }
 
 /* ─── Scanline sweep overlay ─── */
+.scanline-container {
+  overflow: hidden;
+}
+
 .scanline-overlay {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   background: linear-gradient(
     to bottom,
     transparent 0%,
