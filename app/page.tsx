@@ -371,7 +371,7 @@ function HoloCard({ project, index }: { project: typeof projects[0]; index: numb
       onMouseMove={onMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={onMouseLeave}
-      className={`holo-card${visible ? " holo-card--visible" : ""}`}
+      className={`holo-card transition-all duration-300 group-hover/system:opacity-70 hover:!opacity-100 group-hover/system:scale-[0.98] hover:!scale-100${visible ? " holo-card--visible" : ""}`}
       style={{
         transitionDelay: `${index * 100}ms`,
         transform: visible
@@ -631,10 +631,13 @@ export default function Page() {
         </div>
 
         {/* Cards */}
-        <div className="cyb-grid">
-          {projects.map((project, i) => (
-            <HoloCard key={project.id} project={project} index={i} />
-          ))}
+        <div className="group/system relative scanline-container">
+          <div className="cyb-grid">
+            {projects.map((project, i) => (
+              <HoloCard key={project.id} project={project} index={i} />
+            ))}
+          </div>
+          <div className="scanline-overlay pointer-events-none" />
         </div>
 
         <p className="sys-hint mt-14">
@@ -809,11 +812,14 @@ export default function Page() {
           display: grid;
           grid-template-columns: repeat(1, 1fr);
           gap: 1.5rem;
-          max-width: 1000px;
+          max-width: 72rem;
           width: 100%;
+          margin-left: auto;
+          margin-right: auto;
         }
         @media (min-width: 640px) { .cyb-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 900px) { .cyb-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 768px) { .cyb-grid { gap: 2rem; } }
+        @media (min-width: 1024px) { .cyb-grid { grid-template-columns: repeat(4, 1fr); } }
 
         /* ── Holographic card ── */
         .holo-card {

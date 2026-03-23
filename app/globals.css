@@ -369,3 +369,23 @@ body {
   letter-spacing: 0.06em;
   margin-top: 6px;
 }
+
+/* ─── Scanline sweep overlay ─── */
+.scanline-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 255, 150, 0.06) 50%,
+    transparent 100%
+  );
+  opacity: 0.4;
+  animation: scanline-move 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline-move {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
