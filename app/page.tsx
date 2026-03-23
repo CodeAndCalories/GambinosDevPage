@@ -9,6 +9,9 @@ const projects = [
   { id: "offerintegrity", title: "OfferIntegrity", url: "https://offerintegrity.io", desc: "High-ticket offer validator" },
   { id: "bettercalculators", title: "BetterCalculators", url: "https://bettercalculators.net", desc: "170+ free calculators" },
   { id: "toolsdock", title: "ToolsDock", url: "https://toolsdock.io", desc: "Developer utilities & tools" },
+  { id: "memstore", title: "memstore.dev", url: "https://memstore.dev", desc: "Persistent memory API for AI agents" },
+  { id: "propertysignalhq", title: "PropertySignalHQ", url: "https://propertysignalhq.com", desc: "Real estate distress signal aggregator" },
+  { id: "grantlocate", title: "GrantLocate", url: "https://grantlocate.com", desc: "Search 50,000+ active government grants and funding opportunities" },
 ];
 
 const statusLines = [
@@ -17,6 +20,9 @@ const statusLines = [
   { key: "offerintegrity", dots: ".." },
   { key: "calculators", dots: "....." },
   { key: "toolsdock", dots: "......." },
+  { key: "memstore", dots: "......" },
+  { key: "propertysignalhq", dots: "......" },
+  { key: "grantlocate", dots: "......" },
 ];
 
 // ─── Particle canvas (interactive network + cursor response) ───────────────
